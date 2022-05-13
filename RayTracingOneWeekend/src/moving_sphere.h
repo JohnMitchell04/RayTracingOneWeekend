@@ -5,6 +5,7 @@
 #include "hittable.h"
 #include "aabb.h"
 
+// A moving sphere class
 class moving_sphere : public hittable
 {
 public:
@@ -29,6 +30,7 @@ point3 moving_sphere::centre(double time) const
 	return centre0 + ((time - time0) / (time1 - time0)) * (centre1 - centre0);
 }
 
+// Find out if a ray hits the sphere between two times
 bool moving_sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) const {
     vec3 oc = r.origin() - centre(r.time());
     auto a = r.direction().length_squared();
@@ -56,6 +58,7 @@ bool moving_sphere::hit(const ray& r, double t_min, double t_max, hit_record& re
     return true;
 }
 
+// Create a boudning box around the entire ball bounce
 bool moving_sphere::bounding_box(double _time0, double _time1, aabb& output_box) const
 {
     aabb box0(centre(_time0) - vec3(radius, radius, radius),

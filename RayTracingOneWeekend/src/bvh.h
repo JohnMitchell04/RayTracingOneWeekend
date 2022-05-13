@@ -8,6 +8,7 @@
 
 #include <algorithm>
 
+// A bounding box node
 class bvh_node : public hittable
 {
 public:
@@ -25,6 +26,7 @@ public:
 	aabb box;
 };
 
+// Compare two hittable objcts to find the left or right one for different axes
 inline bool box_compare(const shared_ptr<hittable> a, const shared_ptr<hittable> b, int axis)
 {
 	aabb box_a;
@@ -48,6 +50,7 @@ bool box_z_compare(const shared_ptr<hittable> a, const shared_ptr<hittable> b) {
 	return box_compare(a, b, 2);
 }
 
+// Method for creating a bounding box tree that splits all objects into smaller and smaller bounding boxes
 bvh_node::bvh_node(const std::vector<shared_ptr<hittable>>& src_objects, size_t start, size_t end, double time0, double time1)
 {
 	auto objects = src_objects;
@@ -92,6 +95,7 @@ bvh_node::bvh_node(const std::vector<shared_ptr<hittable>>& src_objects, size_t 
 	box = surrounding_box(box_left, box_right);
 }
 
+// Check if bouding box is hit
 bool bvh_node::hit(const ray& r, double t_min, double t_max, hit_record& rec) const
 {
 	if (!box.hit(r, t_min, t_max))

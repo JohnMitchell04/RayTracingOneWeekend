@@ -3,6 +3,7 @@
 
 #include "rtweekend.h"
 
+// Bounding box class
 class aabb
 {
 public:
@@ -34,6 +35,7 @@ public:
 	point3 maximum;
 };
 
+// Create a box around two smaller boxes
 aabb surrounding_box(aabb box0, aabb box1)
 {
 	point3 small(fmin(box0.min().x(), box1.min().x()),

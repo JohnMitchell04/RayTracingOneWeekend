@@ -61,6 +61,7 @@ bool sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) cons
 	return true;
 }
 
+// Create a boudning box around a sphere
 bool sphere::bounding_box(double time0, double time1, aabb& output_box) const
 {
 	output_box = aabb(centre - vec3(radius, radius, radius), centre + vec3(radius, radius, radius));
