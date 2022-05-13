@@ -3,6 +3,7 @@
 
 #include "rtweekend.h"
 #include "hittable_list.h"
+#include "texture.h"
 
 struct hit_record;
 
@@ -17,7 +18,8 @@ public:
 class lambertian : public material 
 {
 public:
-	lambertian(const colour& a) : albedo(a) {}
+	lambertian(const colour& a) : albedo(make_shared<solid_colour>(a)) {}
+	lambertian(shared_ptr<texture> a) : albedo(a) {}
 
 	// Determines whether ray will scatter
 	virtual bool scatter(const ray& r_in, const hit_record& rec, colour& attenuation, ray& scattered) const override 
@@ -29,12 +31,12 @@ public:
 			scattered_direction = rec.normal;
 
 		scattered = ray(rec.p, scattered_direction, r_in.time());
-		attenuation = albedo;
+		attenuation = albedo->value(rec.u, rec.v, rec.p);
 		return true;
 	}
 
 public:
-	colour albedo;
+	shared_ptr<texture> albedo;
 };
 
 // A type of material
