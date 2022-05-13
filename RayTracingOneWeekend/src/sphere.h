@@ -11,6 +11,7 @@ public:
 	sphere(point3 cen, double r, shared_ptr<material> m) : centre(cen), radius(r), mat_ptr(m) {}
 
 	virtual bool hit(const ray& r, double t_min, double t_max, hit_record& rec) const override;
+	virtual bool bounding_box(double time0, double time1, aabb& output_box) const override;
 
 public:
 	point3 centre;
@@ -47,6 +48,12 @@ bool sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) cons
 	rec.mat_ptr = mat_ptr;
 
 	return true;
-};
+}
+
+bool sphere::bounding_box(double time0, double time1, aabb& output_box) const
+{
+	output_box = aabb(centre - vec3(radius, radius, radius), centre + vec3(radius, radius, radius));
+	return true;
+}
 
 #endif
