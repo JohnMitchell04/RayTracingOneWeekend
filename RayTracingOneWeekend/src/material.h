@@ -12,6 +12,7 @@ class material
 {
 public:
 	virtual bool scatter(const ray& r_in, const hit_record& rec, colour& attenuation, ray& scattered) const = 0;
+	virtual colour emitted(double u, double v, const point3& p) const { return colour(0, 0, 0); }
 };
 
 // A type of material like a solid matte object
@@ -97,6 +98,23 @@ private:
 		r0 = r0 * r0;
 		return r0 + (1 - r0) * pow((1 - cosine), 5);
 	}
+};
+
+// A light emitting material
+class diffuse_light : public material
+{
+public:
+	diffuse_light(shared_ptr<texture> a) : emit(a) {}
+	diffuse_light(colour c) : emit(make_shared<solid_colour>(c)) {}
+
+	virtual bool scatter(const ray& r_in, const hit_record& rec, colour& attentuation, ray& scattered) const override { return false; }
+	virtual colour emitted(double u, double v, const point3& p) const override
+	{
+		return emit->value(u, v, p);
+	}
+
+public:
+	shared_ptr<texture> emit;
 };
 
 #endif
