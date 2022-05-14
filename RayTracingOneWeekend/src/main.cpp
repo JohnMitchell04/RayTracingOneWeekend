@@ -11,7 +11,7 @@
 #include <future>
 #include <thread>
 
-colour ray_colour(const ray& r, const hittable& world, int depth) {
+static colour ray_colour(const ray& r, const hittable& world, int depth) {
     hit_record rec;
 
     if (depth <= 0)
@@ -30,7 +30,7 @@ colour ray_colour(const ray& r, const hittable& world, int depth) {
     return (1.0 - t) * colour(1.0, 1.0, 1.0) + t * colour(0.5, 0.7, 1.0);
 }
 
-hittable_list two_spheres() {
+static hittable_list two_spheres() {
     hittable_list objects;
 
     auto checker = make_shared<checker_texture>(colour(0.2, 0.3, 0.1), colour(0.9, 0.9, 0.9));
@@ -41,11 +41,11 @@ hittable_list two_spheres() {
     return objects;
 }
 
-hittable_list two_perlin_spheres()
+static hittable_list two_perlin_spheres()
 {
     hittable_list objects;
 
-    auto pertext = make_shared<noise_texture>();
+    auto pertext = make_shared<noise_texture>(4);
 
     objects.add(make_shared<sphere>(point3(0, -1000, 0), 1000, make_shared<lambertian>(pertext)));
     objects.add(make_shared<sphere>(point3(0, 2, 0), 2, make_shared<lambertian>(pertext)));
@@ -53,7 +53,7 @@ hittable_list two_perlin_spheres()
     return objects;
 }
 
-hittable_list random_scene()
+static hittable_list random_scene()
 {
     hittable_list world;
 
@@ -108,8 +108,8 @@ static std::mutex output_mutex;
 
 // Calulate a row of pixels
 static void calculate_pixels(
-    std::vector<std::vector<std::tuple<int, int, colour>>>& rows, int image_width, int image_height,
-    int samples_per_pixel, hittable_list world, camera cam, int max_depth, int j
+    std::vector<std::vector<std::tuple<int, int, colour>>>& rows, hittable_list& world, camera& cam,
+    int image_width, int image_height, int samples_per_pixel, int max_depth, int j
 )
 {
     std::vector<std::tuple<int, int, colour>> current_row;
@@ -145,7 +145,7 @@ static void wake_main_thread(std::vector<std::vector<std::tuple<int, int, colour
 int main()
 {
     // Image
-    const auto aspect_ratio = 16.0 / 9.0;
+    const double aspect_ratio = 16.0 / 9.0;
     const int image_width = 400;
     const int samples_per_pixel = 100;
     const int max_depth = 50;
@@ -155,8 +155,8 @@ int main()
 
     point3 lookfrom;
     point3 lookat;
-    auto vfov = 40.0;
-    auto aperture = 0.0;
+    double vfov = 40.0;
+    double aperture = 0.0;
 
     switch (0) {
     case 1:
@@ -186,7 +186,7 @@ int main()
     // Camera
 
     vec3 vup(0, 1, 0);
-    auto dist_to_focus = 10.0;
+    double dist_to_focus = 10.0;
     int image_height = static_cast<int>(image_width / aspect_ratio);
 
     camera cam(lookfrom, lookat, vup, vfov, aspect_ratio, aperture, dist_to_focus, 0.0, 1.0);
@@ -203,11 +203,14 @@ int main()
     for (int j = image_height - 1; j >= 0; --j)
     {
         future.push_back(std::async(std::launch::async, std::ref(calculate_pixels),
-            std::ref(rows), image_width, image_height, samples_per_pixel, world, cam, max_depth, j)
+            std::ref(rows), std::ref(world), std::ref(cam),
+            image_width, image_height, samples_per_pixel, max_depth, j)
         );
     }
     // Add the wake main thread and wait until it does
-    future.push_back(std::async(std::launch::async, std::ref(wake_main_thread), std::ref(rows), std::ref(cv), image_height));
+    future.push_back(std::async(std::launch::async, std::ref(wake_main_thread),
+        std::ref(rows), std::ref(cv), image_height)
+    );
     std::unique_lock<std::mutex> lck(threads);
     cv.wait(lck);
 
