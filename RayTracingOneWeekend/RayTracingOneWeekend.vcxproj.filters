@@ -62,5 +62,11 @@
     <ClInclude Include="src\perlin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\external\stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rtw_stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
