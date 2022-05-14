@@ -143,6 +143,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\aarect.h" />
+    <ClInclude Include="src\box.h" />
     <ClInclude Include="src\external\stb_image.h" />
     <ClInclude Include="src\aabb.h" />
     <ClInclude Include="src\bvh.h" />
